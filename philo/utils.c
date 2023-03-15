@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:34:57 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/12 23:42:07 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/15 00:01:05 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,13 @@ void	ft_putendl_fd(char	*s)
 
 void	my_usleep(int time)
 {
-	int	i;
+	// int	i;
 
-	i = 0;
-	while (i < time / 10)
-	{
-		usleep(10);
-		i++;
-	}
+	// i = 0;
+	// while (i < time / 10)
+	// {
+	// 	usleep(10);
+	// 	i++;
+	// }
+	usleep(time);
 }

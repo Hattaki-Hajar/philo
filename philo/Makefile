@@ -13,7 +13,7 @@ MK_FILE	= Makefile
 PTHREAD	= -lpthread
 
 .c.o	:
-			$(CC) -o $@ -c $<
+			$(CC) $(CFLAGS) -o $@ -c $<
 
 all		: $(NAME)
 
