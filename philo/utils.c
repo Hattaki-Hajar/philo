@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:34:57 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/15 00:01:05 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/16 02:08:25 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,16 @@ void	my_usleep(int time)
 	// 	i++;
 	// }
 	usleep(time);
+}
+
+long	convert_time(struct timeval init, struct timeval rn)
+{
+	long	res;
+	long	init_ms;
+	long	rn_ms;
+
+	init_ms = (init.tv_sec * 1000) + (init.tv_usec / 1000);
+	rn_ms = (rn.tv_sec * 1000) + (rn.tv_usec / 1000);
+	res = rn_ms - init_ms;
+	return (res);
 }

@@ -2,7 +2,7 @@ SRCS	= $(wildcard *.c)
 
 CC		= cc
 
-CFLAGS	= -Werror -Wextra -Wall -g -fsanitize=address
+CFLAGS	= -Werror -Wextra -Wall
 
 NAME	= philo
 
