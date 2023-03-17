@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 22:56:22 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 19:14:05 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 00:39:04 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,17 @@
 # define INIT 1
 # define DESTROY 0
 
+typedef struct s_init
+{
+	struct timeval	init;
+	pthread_mutex_t	*death;
+}	t_init;
+
 typedef struct s_ph
 {
 	pthread_mutex_t	*mutex;
-	struct timeval	*init;
-	struct timeval	vl;
+	pthread_mutex_t	*death;
+	t_init			init;
 	long			time_to_eat;
 	long			time_to_sleep;
 	long			time_to_die;

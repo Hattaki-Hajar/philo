@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 23:50:06 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 00:39:23 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,24 +23,24 @@ void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
 		ph->nb_to_eat = ft_atoi(av[5]);
 	else
 		ph->nb_to_eat = -1;
-	ph->init = vl_init;
+	ph->death = ph->init.death;
 }
 
 void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 {
-	struct timeval	init;
 	struct timeval	vl;
 	int				i;
 	int				ph_nb;
 
 	i = 0;
 	ph_nb = ft_atoi(av[1]);
-	gettimeofday(&init, 0);
+	ph->init.death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	gettimeofday(&(ph->init.init), 0);
 	while (i < ph_nb)
 	{
 		(ph + i)->nb = ph_nb;
 		(ph + i)->pos = i;
-		init_struct(ph + i, ac, av, &init);
+		init_struct(ph + i, ac, av, &(ph->init.init));
 		pthread_create(id + i, NULL, ft_routine, ph + i);
 		i++;
 	}
@@ -54,7 +54,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 			// printf("%ld %ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)), ph->time_to_die);
 			if (convert_time(&(vl)) - convert_time(&(ph->vl)) >= ph->time_to_die)
 			{
-				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&init), ph->pos + 1);
+				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&(ph->init.init)), ph->pos + 1);
 				return ;
 			}
 			// printf ("-->%ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)));

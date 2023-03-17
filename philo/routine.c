@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 23:55:13 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 00:02:04 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ void	*ft_routine(void *tmp)
 	if (ph->pos % 2)
 		usleep(1000);
 	i = 0;
-	// ph->vl = 0;
 	gettimeofday(&(ph->vl), 0);
 	while (1)
 	{
