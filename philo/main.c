@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 22:17:47 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/17 23:50:06 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&init), ph->pos + 1);
 				return ;
 			}
+			// printf ("-->%ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)));
 			i++;
 		}
 	}
@@ -113,5 +114,6 @@ int	main(int ac, char **av)
 	while (i < ph_nb)
 		(ph + i++)->mutex = mutex;
 	create_and_wait_for_threads(id, ac, av, ph);
-	// mutex_init_or_destroy(mutex, ph_nb, DESTROY);
+	mutex_init_or_destroy(mutex, ph_nb, DESTROY);
+	system("leaks philo");
 }

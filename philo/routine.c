@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 22:56:54 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/17 23:55:13 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	ft_eat(t_ph *ph)
 	mode = securing_forks(ph);
 	gettimeofday(&(ph->vl), 0);
 	printf("%ld: %d is eating\n", convert_time(&(ph->vl)) - convert_time(ph->init), ph->pos + 1);
+	// gettimeofday(&(ph->vl), 0);
 	my_usleep(ph->time_to_eat * 1000);
 	pthread_mutex_unlock(&(ph->mutex[ph->pos]));
 	if (!mode)
@@ -66,6 +67,8 @@ void	*ft_routine(void *tmp)
 	if (ph->pos % 2)
 		usleep(1000);
 	i = 0;
+	// ph->vl = 0;
+	gettimeofday(&(ph->vl), 0);
 	while (1)
 	{
 		ft_eat(ph);
