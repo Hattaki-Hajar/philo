@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/16 01:42:42 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/17 22:17:47 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,22 @@
 
 void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
 {
-	ph->time_to_die = ft_atoi(av[2]) * 1000;
-	ph->time_to_eat = ft_atoi(av[3]) * 1000;
-	ph->time_to_sleep = ft_atoi(av[4]) * 1000;
+	if (ft_atoi(av[2]) <= 0 || ft_atoi(av[3]) <= 0 || ft_atoi(av[4]) <= 0)
+		ft_putendl_fd("Error: Invalid argument");
+	ph->time_to_die = ft_atoi(av[2]);
+	ph->time_to_eat = ft_atoi(av[3]);
+	ph->time_to_sleep = ft_atoi(av[4]);
 	if (ac == 6)
 		ph->nb_to_eat = ft_atoi(av[5]);
 	else
 		ph->nb_to_eat = -1;
-	ph->death = 1;
-	gettimeofday(&(ph->vl), 0);
 	ph->init = vl_init;
 }
 
 void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 {
 	struct timeval	init;
+	struct timeval	vl;
 	int				i;
 	int				ph_nb;
 
@@ -37,22 +38,23 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	gettimeofday(&init, 0);
 	while (i < ph_nb)
 	{
-		(ph + i)->ph_nb = ph_nb;
-		(ph + i)->ph_pos = i;
+		(ph + i)->nb = ph_nb;
+		(ph + i)->pos = i;
 		init_struct(ph + i, ac, av, &init);
-		if (i % 2)
-			usleep(10);
 		pthread_create(id + i, NULL, ft_routine, ph + i);
 		i++;
 	}
+	usleep(200);
 	while (1)
 	{
 		i = 0;
 		while (i < ph_nb)
 		{
-			if (!((ph + i)->death))
+			gettimeofday(&vl, 0);
+			// printf("%ld %ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)), ph->time_to_die);
+			if (convert_time(&(vl)) - convert_time(&(ph->vl)) >= ph->time_to_die)
 			{
-				printf("%d died\n", ph->ph_pos + 1);
+				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&init), ph->pos + 1);
 				return ;
 			}
 			i++;
@@ -61,7 +63,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	i = 0;
 	while (i < ph_nb)
 	{
-		pthread_join(id[i], NULL);
+		pthread_detach(id[i]);
 		i++;
 	}
 }
@@ -101,6 +103,8 @@ int	main(int ac, char **av)
 	if (ac > 6 || ac < 5)
 		ft_putendl_fd("Error: wrong number of arguments");
 	ph_nb = ft_atoi(av[1]);
+	if (ft_atoi(av[1]) <= 0)
+		ft_putendl_fd("Error: Invalid argument");
 	id = (pthread_t *)malloc(ph_nb * sizeof(pthread_t));
 	ph = (t_ph *)malloc(ph_nb * sizeof(t_ph));
 	mutex = (pthread_mutex_t *)malloc(ph_nb * sizeof(pthread_mutex_t));

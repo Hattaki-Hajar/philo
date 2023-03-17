@@ -2,7 +2,7 @@ SRCS	= $(wildcard *.c)
 
 CC		= cc
 
-CFLAGS	= -Werror -Wextra -Wall
+CFLAGS	= -Werror -Wextra -Wall -fsanitize=thread -g
 
 NAME	= philo
 
@@ -21,10 +21,10 @@ $(NAME)	: $(OBJS) $(MK_FILE)
 		$(CC) $(CFLAGS) $(PTHREAD) $(SRCS) -o $(NAME)
 
 clean	:
-		rm $(OBJS)
+		rm -rf $(OBJS)
 
 fclean	: clean
-			rm -rf $(NAME)
-			echo $(NAME) is deleted
+		rm -rf $(NAME)
+		echo $(NAME) is deleted
 
 re		: fclean all
