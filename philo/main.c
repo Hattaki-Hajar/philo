@@ -6,13 +6,13 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/18 00:39:23 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 21:38:12 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
+void	init_struct(t_ph *ph, int ac, char **av)
 {
 	if (ft_atoi(av[2]) <= 0 || ft_atoi(av[3]) <= 0 || ft_atoi(av[4]) <= 0)
 		ft_putendl_fd("Error: Invalid argument");
@@ -40,7 +40,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	{
 		(ph + i)->nb = ph_nb;
 		(ph + i)->pos = i;
-		init_struct(ph + i, ac, av, &(ph->init.init));
+		init_struct(ph + i, ac, av);
 		pthread_create(id + i, NULL, ft_routine, ph + i);
 		i++;
 	}
@@ -115,5 +115,5 @@ int	main(int ac, char **av)
 		(ph + i++)->mutex = mutex;
 	create_and_wait_for_threads(id, ac, av, ph);
 	mutex_init_or_destroy(mutex, ph_nb, DESTROY);
-	system("leaks philo");
+	// system("leaks philo");
 }

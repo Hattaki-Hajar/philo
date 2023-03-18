@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 22:56:22 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/18 00:39:04 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 21:34:08 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ typedef struct s_ph
 {
 	pthread_mutex_t	*mutex;
 	pthread_mutex_t	*death;
+	struct timeval	vl;
 	t_init			init;
 	long			time_to_eat;
 	long			time_to_sleep;
