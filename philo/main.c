@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/18 21:38:12 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/18 22:39:22 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	init_struct(t_ph *ph, int ac, char **av)
 		ph->nb_to_eat = ft_atoi(av[5]);
 	else
 		ph->nb_to_eat = -1;
-	ph->death = ph->init.death;
 }
 
 void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
@@ -34,8 +33,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 
 	i = 0;
 	ph_nb = ft_atoi(av[1]);
-	ph->init.death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-	gettimeofday(&(ph->init.init), 0);
+	gettimeofday(&(ph->init), 0);
 	while (i < ph_nb)
 	{
 		(ph + i)->nb = ph_nb;
@@ -54,7 +52,7 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 			// printf("%ld %ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)), ph->time_to_die);
 			if (convert_time(&(vl)) - convert_time(&(ph->vl)) >= ph->time_to_die)
 			{
-				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&(ph->init.init)), ph->pos + 1);
+				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&(ph->init)), ph->pos + 1);
 				return ;
 			}
 			// printf ("-->%ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)));
@@ -69,33 +67,38 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	}
 }
 
-void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
+pthread_mutex_t	*mutex_init_or_destroy(pthread_mutex_t *id, int num, int mode)
 {
-	int	i;
+	pthread_mutex_t	*death;
+	int				i;
 
 	i = 0;
-	if (mode)
+	if (mode == INIT)
 	{
-		while (i < fork_num)
+		death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+		while (i < num)
 		{
 			pthread_mutex_init(id + i, NULL);
 			i++;
 		}
+		pthread_mutex_init(death, NULL);
 	}
-	else
+	else if (mode == DESTROY)
 	{
-		while (i < fork_num)
+		while (i < num)
 		{
 			pthread_mutex_destroy(id + i);
 			i++;
 		}
 	}
+	return (0);
 }
 
 int	main(int ac, char **av)
 {
 	pthread_t		*id;
 	t_ph			*ph;
+	pthread_mutex_t	*death;
 	pthread_mutex_t	*mutex;
 	int				ph_nb;
 	int				i;
@@ -109,11 +112,15 @@ int	main(int ac, char **av)
 	id = (pthread_t *)malloc(ph_nb * sizeof(pthread_t));
 	ph = (t_ph *)malloc(ph_nb * sizeof(t_ph));
 	mutex = (pthread_mutex_t *)malloc(ph_nb * sizeof(pthread_mutex_t));
-	mutex_init_or_destroy(mutex, ph_nb, INIT);
+	death = mutex_init_or_destroy(mutex, ph_nb, INIT);
 	i = 0;
 	while (i < ph_nb)
-		(ph + i++)->mutex = mutex;
+	{
+		(ph + i)->mutex = mutex;
+		(ph + i++)->death = death;
+	}
 	create_and_wait_for_threads(id, ac, av, ph);
 	mutex_init_or_destroy(mutex, ph_nb, DESTROY);
+	// pthread_mutex_destroy(death);
 	// system("leaks philo");
 }
