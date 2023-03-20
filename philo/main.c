@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/18 22:39:22 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/20 19:08:10 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 			if (convert_time(&(vl)) - convert_time(&(ph->vl)) >= ph->time_to_die)
 			{
 				printf("%ld: %d died\n", convert_time(&vl) - convert_time(&(ph->init)), ph->pos + 1);
+				// pthread_mutex_lock(ph->death);
+				// ph->death = 0;
+				// pthread_mutex_unlock(ph->death);
 				return ;
 			}
 			// printf ("-->%ld\n", convert_time(&(vl)) - convert_time(&(ph->vl)));
@@ -67,21 +70,19 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	}
 }
 
-pthread_mutex_t	*mutex_init_or_destroy(pthread_mutex_t *id, int num, int mode)
+void	mutex_init_or_destroy(pthread_mutex_t *id, int num, int mode)
 {
-	pthread_mutex_t	*death;
+	// pthread_mutex_t	*death;
 	int				i;
 
 	i = 0;
 	if (mode == INIT)
 	{
-		death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 		while (i < num)
 		{
 			pthread_mutex_init(id + i, NULL);
 			i++;
 		}
-		pthread_mutex_init(death, NULL);
 	}
 	else if (mode == DESTROY)
 	{
@@ -91,7 +92,6 @@ pthread_mutex_t	*mutex_init_or_destroy(pthread_mutex_t *id, int num, int mode)
 			i++;
 		}
 	}
-	return (0);
 }
 
 int	main(int ac, char **av)
@@ -112,7 +112,9 @@ int	main(int ac, char **av)
 	id = (pthread_t *)malloc(ph_nb * sizeof(pthread_t));
 	ph = (t_ph *)malloc(ph_nb * sizeof(t_ph));
 	mutex = (pthread_mutex_t *)malloc(ph_nb * sizeof(pthread_mutex_t));
-	death = mutex_init_or_destroy(mutex, ph_nb, INIT);
+	death = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	// death = mutex_init_or_destroy(mutex, ph_nb, INIT);
+	pthread_mutex_init(death, 0);
 	i = 0;
 	while (i < ph_nb)
 	{

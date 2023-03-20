@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/18 22:40:34 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/20 19:08:04 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,10 @@ void	*ft_routine(void *tmp)
 	gettimeofday(&(ph->vl), 0);
 	while (1)
 	{
+		// pthread_mutex_lock(ph->death);
+		// if (!ph->death)
+		// 	return (0);
+		// pthread_mutex_unlock(ph->death);
 		ft_eat(ph);
 		ft_sleep(ph);
 		gettimeofday(&vl, 0);
