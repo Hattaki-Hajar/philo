@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:34:57 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/17 23:17:39 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/21 22:27:31 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,19 +64,22 @@ void	my_usleep(int time)
 
 	gettimeofday(&t0, 0);
 	gettimeofday(&rn, 0);
-	while ((convert_time(&rn) - convert_time(&t0)) < time / 1000)
+	while ((convert_time(&rn) - convert_time(&t0)) < time)
 	{
 		usleep(100);
 		gettimeofday(&rn, 0);
 	}
-	// usleep(time);
 }
 
-long	convert_time(struct timeval *init)
+void	ft_printf(char *str, t_ph *ph)
 {
-	long	res;
+	struct timeval	vl;
+	long			time;
 
-	// printf("%ld %d\n", init->tv_sec, init->tv_usec);
-	res = (init->tv_sec * 1000) + (init->tv_usec / 1000);
-	return (res);
+	gettimeofday(&vl, 0);
+	time = convert_time(&vl) - convert_time(ph->init);
+	pthread_mutex_lock(ph->death);
+	if ((*ph->died))
+		printf("%ld: %d %s\n", time, (ph->pos + 1), str);
+	pthread_mutex_unlock(ph->death);
 }

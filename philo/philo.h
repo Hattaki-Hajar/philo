@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 22:56:22 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/20 19:01:54 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/21 23:07:44 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,24 @@ typedef struct s_ph
 {
 	pthread_mutex_t	*mutex;
 	pthread_mutex_t	*death;
-	struct timeval	init;
+	struct timeval	*init;
 	struct timeval	vl;
 	long			time_to_eat;
 	long			time_to_sleep;
 	long			time_to_die;
 	int				nb_to_eat;
+	int				*died;
 	int				pos;
 	int				nb;
 }	t_ph;
 
 /*-------utils-------*/
+void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init);
 long	convert_time(struct timeval *init);
+void	ft_printf(char *str, t_ph *ph);
 void	ft_putendl_fd(char	*s);
-int		ft_atoi(char *str);
 void	my_usleep(int time);
+int		ft_atoi(char *str);
 
 /*------routine------*/
 void	ft_eat(t_ph *ph);

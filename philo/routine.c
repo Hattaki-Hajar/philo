@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/20 19:08:04 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/21 22:25:57 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,18 @@
 
 int	securing_forks(t_ph *ph)
 {
-	struct timeval	vl;
-
 	pthread_mutex_lock(&(ph->mutex[ph->pos]));
-	gettimeofday(&vl, 0);
-	printf("%ld: %d has taken a fork\n", convert_time(&vl) - convert_time(&(ph->init)), ph->pos + 1);
+	ft_printf("has taken a fork", ph);
 	if (ph->pos)
 	{
 		pthread_mutex_lock(&(ph->mutex[ph->pos - 1]));
+		ft_printf("has taken a fork", ph);
 		return (1);
 	}
 	else
 	{
 		pthread_mutex_lock(&(ph->mutex[ph->nb - 1]));
+		ft_printf("has taken a fork", ph);
 		return (0);
 	}
 }
@@ -37,9 +36,8 @@ void	ft_eat(t_ph *ph)
 
 	mode = securing_forks(ph);
 	gettimeofday(&(ph->vl), 0);
-	printf("%ld: %d is eating\n", convert_time(&(ph->vl)) - convert_time(&(ph->init)), ph->pos + 1);
-	// gettimeofday(&(ph->vl), 0);
-	my_usleep(ph->time_to_eat * 1000);
+	ft_printf("is eating", ph);
+	my_usleep(ph->time_to_eat);
 	pthread_mutex_unlock(&(ph->mutex[ph->pos]));
 	if (!mode)
 		pthread_mutex_unlock(&(ph->mutex[ph->nb - 1]));
@@ -49,17 +47,22 @@ void	ft_eat(t_ph *ph)
 
 void	*ft_sleep(t_ph *ph)
 {
-	struct timeval	vl;
+	ft_printf("is sleeping", ph);
+	my_usleep(ph->time_to_sleep);
+	return (0);
+}
 
-	gettimeofday(&vl, 0);
-	printf("%ld: %d is sleeping\n", convert_time(&vl) - convert_time(&(ph->init)), ph->pos + 1);
-	my_usleep(ph->time_to_sleep * 1000);
+int	died(t_ph *ph)
+{
+	pthread_mutex_lock(ph->death);
+	if (!(*ph->died))
+		return (1);
+	pthread_mutex_unlock(ph->death);
 	return (0);
 }
 
 void	*ft_routine(void *tmp)
 {
-	struct timeval	vl;
 	t_ph			*ph;
 	int				i;
 
@@ -70,14 +73,15 @@ void	*ft_routine(void *tmp)
 	gettimeofday(&(ph->vl), 0);
 	while (1)
 	{
-		// pthread_mutex_lock(ph->death);
-		// if (!ph->death)
-		// 	return (0);
-		// pthread_mutex_unlock(ph->death);
+		if (died(ph))
+			return (0);
 		ft_eat(ph);
+		if (died(ph))
+			return (0);
 		ft_sleep(ph);
-		gettimeofday(&vl, 0);
-		printf("%ld: %d is thinking\n", convert_time(&vl) - convert_time(&(ph->init)), ph->pos + 1);
+		if (died(ph))
+			return (0);
+		ft_printf("is thinking", ph);
 	}
 	return (0);
 }
