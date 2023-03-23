@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/22 22:04:28 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 17:06:32 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@ int	check_death(t_ph *ph, struct timeval *init)
 		i = 0;
 		while (i < ph->nb)
 		{
+			pthread_mutex_lock(ph->eat);
+			if (!*(ph->check))
+			{
+				pthread_mutex_unlock(ph->eat);
+				return (0);
+			}
+			pthread_mutex_unlock(ph->eat);
 			gettimeofday(&vl, 0);
 			time = convert_time(&(vl)) - convert_time(&(ph->vl));
 			if (time >= ph->time_to_die)
@@ -70,7 +77,7 @@ void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
 	i = 0;
 	if (mode == INIT)
 	{
-		while (i <= fork_num)
+		while (i < fork_num)
 		{
 			pthread_mutex_init(id + i, NULL);
 			i++;
@@ -78,7 +85,7 @@ void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
 	}
 	else
 	{
-		while (i <= fork_num)
+		while (i < fork_num)
 		{
 			pthread_mutex_destroy(id + i);
 			i++;
@@ -104,8 +111,11 @@ int	main(int ac, char **av)
 	pthread_t		*id;
 	t_ph			*ph;
 	pthread_mutex_t	*mutex[2];
+	pthread_mutex_t	*eat;
 	int				ph_nb;
 	int				*died;
+	int				*check;
+	int				i = 0;
 
 	(void)ac;
 	if (ac > 6 || ac < 5)
@@ -117,12 +127,22 @@ int	main(int ac, char **av)
 	ph = (t_ph *)malloc(ph_nb * sizeof(t_ph));
 	mutex[0] = (pthread_mutex_t *)malloc((ph_nb) * sizeof(pthread_mutex_t));
 	mutex[1] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	eat = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 	died = malloc(sizeof(int));
+	check = malloc(sizeof(int));
+	*check = ph_nb;
 	*died = 1;
 	mutex_init_or_destroy(mutex[0], ph_nb, INIT);
 	pthread_mutex_init(mutex[1], 0);
+	pthread_mutex_init(eat, 0);
+	while (i < ph_nb)
+	{
+		(ph + i)->check = check;
+		(ph + i++)->eat = eat;
+	}
 	init(ph, ph_nb, mutex, died);
 	create_and_wait_for_threads(id, ac, av, ph);
 	mutex_init_or_destroy(mutex[0], ph_nb, DESTROY);
 	pthread_mutex_destroy(mutex[1]);
+	pthread_mutex_destroy(eat);
 }

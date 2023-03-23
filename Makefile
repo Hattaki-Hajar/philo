@@ -4,7 +4,7 @@ BONUS_SRCS	= $(wildcard ./philos_bonus/*.c)
 
 CC		= cc
 
-CFLAGS	= -Werror -Wextra -Wall -fsanitize=address -g
+CFLAGS	= -Werror -Wextra -Wall
 
 NAME	= philo
 
