@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 22:56:22 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/22 23:52:08 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:21:06 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef struct s_ph
 }	t_ph;
 
 /*-------utils-------*/
-void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init);
+int		init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init);
 long	convert_time(struct timeval *init);
 void	ft_printf(char *str, t_ph *ph);
 void	ft_putendl_fd(char	*s);

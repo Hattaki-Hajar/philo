@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/23 17:06:32 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:20:50 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,8 @@ int	check_death(t_ph *ph, struct timeval *init)
 		while (i < ph->nb)
 		{
 			pthread_mutex_lock(ph->eat);
-			if (!*(ph->check))
-			{
-				pthread_mutex_unlock(ph->eat);
+			if (*(ph->check) <= 0)
 				return (0);
-			}
 			pthread_mutex_unlock(ph->eat);
 			gettimeofday(&vl, 0);
 			time = convert_time(&(vl)) - convert_time(&(ph->vl));
@@ -47,7 +44,7 @@ int	check_death(t_ph *ph, struct timeval *init)
 	return (1);
 }
 
-void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
+int	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 {
 	struct timeval	init;
 	int				i;
@@ -60,14 +57,16 @@ void	create_and_wait_for_threads(pthread_t *id, int ac, char **av, t_ph *ph)
 	{
 		(ph + i)->nb = ph_nb;
 		(ph + i)->pos = i;
-		init_struct(ph + i, ac, av, &init);
+		if (init_struct(ph + i, ac, av, &init) == -1)
+			return (-1);
 		pthread_create(id + i, NULL, ft_routine, ph + i);
 		pthread_detach(id[i]);
 		i++;
 	}
 	usleep(200);
 	if (!check_death(ph, &init))
-		return ;
+		return (0);
+	return (0);
 }
 
 void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
@@ -119,10 +118,16 @@ int	main(int ac, char **av)
 
 	(void)ac;
 	if (ac > 6 || ac < 5)
+	{
 		ft_putendl_fd("Error: wrong number of arguments");
+		return (1);
+	}
 	ph_nb = ft_atoi(av[1]);
 	if (ft_atoi(av[1]) <= 0)
+	{
 		ft_putendl_fd("Error: Invalid argument");
+		return (1);
+	}
 	id = (pthread_t *)malloc(ph_nb * sizeof(pthread_t));
 	ph = (t_ph *)malloc(ph_nb * sizeof(t_ph));
 	mutex[0] = (pthread_mutex_t *)malloc((ph_nb) * sizeof(pthread_mutex_t));
@@ -141,7 +146,8 @@ int	main(int ac, char **av)
 		(ph + i++)->eat = eat;
 	}
 	init(ph, ph_nb, mutex, died);
-	create_and_wait_for_threads(id, ac, av, ph);
+	if (create_and_wait_for_threads(id, ac, av, ph) == -1)
+		return (0);
 	mutex_init_or_destroy(mutex[0], ph_nb, DESTROY);
 	pthread_mutex_destroy(mutex[1]);
 	pthread_mutex_destroy(eat);

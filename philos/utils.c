@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:34:57 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/21 22:27:31 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:21:58 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	ft_atoi(char *str)
 			return (check_max(sign));
 	}
 	if (str && *str && (*str < '0' || *str > '9'))
-		ft_putendl_fd("Error: Numeric argument required");
+		return (-1);
 	return (n * sign);
 }
 
@@ -54,7 +54,6 @@ void	ft_putendl_fd(char	*s)
 		i++;
 	}
 	write (2, "\n", 1);
-	exit (1);
 }
 
 void	my_usleep(int time)
@@ -79,7 +78,9 @@ void	ft_printf(char *str, t_ph *ph)
 	gettimeofday(&vl, 0);
 	time = convert_time(&vl) - convert_time(ph->init);
 	pthread_mutex_lock(ph->death);
-	if ((*ph->died))
+	pthread_mutex_lock(ph->eat);
+	if ((*ph->died) && *(ph->check) > 0)
 		printf("%ld: %d %s\n", time, (ph->pos + 1), str);
+	pthread_mutex_unlock(ph->eat);
 	pthread_mutex_unlock(ph->death);
 }

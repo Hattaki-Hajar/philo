@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 22:23:29 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/21 23:07:23 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:18:24 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,28 @@ long	convert_time(struct timeval *init)
 	return (res);
 }
 
-void	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
+int	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
 {
 	if (ft_atoi(av[2]) <= 0 || ft_atoi(av[3]) <= 0 || ft_atoi(av[4]) <= 0)
+	{
 		ft_putendl_fd("Error: Invalid argument");
+		return (-1);
+		
+	}
 	ph->time_to_die = ft_atoi(av[2]);
 	ph->time_to_eat = ft_atoi(av[3]);
 	ph->time_to_sleep = ft_atoi(av[4]);
 	if (ac == 6)
+	{
 		ph->nb_to_eat = ft_atoi(av[5]);
+		if (ph->nb_to_eat <= 0)
+		{
+			ft_putendl_fd("Error: Invalid argument");
+			return (-1);
+		}
+	}
 	else
 		ph->nb_to_eat = -1;
 	ph->init = vl_init;
+	return (0);
 }
