@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/22 22:33:23 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:54:45 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,13 @@ void	*ft_routine(void *tmp)
 {
 	t_ph			*ph;
 	int				i;
-	int				nb = 0;
+	int				nb;
 
 	ph = (t_ph *)tmp;
 	if (ph->pos % 2)
 		usleep(1000);
 	i = 0;
+	nb = 0;
 	gettimeofday(&(ph->vl), 0);
 	while (1)
 	{
@@ -78,12 +79,7 @@ void	*ft_routine(void *tmp)
 			return (0);
 		ft_eat(ph);
 		nb++;
-		if (ph->nb_to_eat > -1 && nb >= ph->nb_to_eat)
-		{
-			pthread_mutex_lock(ph->eat);
-			(*(ph->check))--;
-			pthread_mutex_unlock(ph->eat);
-		}
+		check_eat(ph, nb);
 		if (died(ph))
 			return (0);
 		ft_sleep(ph);

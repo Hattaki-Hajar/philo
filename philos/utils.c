@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:34:57 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/23 21:21:58 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/23 21:32:48 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	ft_atoi(char *str)
 	return (n * sign);
 }
 
-void	ft_putendl_fd(char	*s)
+int	ft_putendl_fd(char	*s)
 {
 	int	i;
 
@@ -54,6 +54,7 @@ void	ft_putendl_fd(char	*s)
 		i++;
 	}
 	write (2, "\n", 1);
+	return (-1);
 }
 
 void	my_usleep(int time)
