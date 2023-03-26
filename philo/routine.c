@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/23 21:54:45 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/26 00:44:55 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,11 @@ int	died(t_ph *ph)
 void	*ft_routine(void *tmp)
 {
 	t_ph			*ph;
-	int				i;
 	int				nb;
 
 	ph = (t_ph *)tmp;
 	if (ph->pos % 2)
 		usleep(1000);
-	i = 0;
 	nb = 0;
 	gettimeofday(&(ph->vl), 0);
 	while (1)
