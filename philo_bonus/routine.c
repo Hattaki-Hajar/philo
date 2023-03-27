@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/26 02:36:30 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/27 03:23:28 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,12 @@ void	eat_b(t_ph_b *ph)
 	gettimeofday(&vl, 0);
 	time = convert_time(&vl) - convert_time(ph->init);
 	printf("%ld: %d has taken a fork\n", time, ph->pos + 1);
+	sem_post(ph->forks);
+	sem_post(ph->forks);
 	gettimeofday(&(ph->vl), 0);
 	time = convert_time(&(ph->vl)) - convert_time(ph->init);
 	printf("%ld: %d is eating\n", time, ph->pos + 1);
+	my_usleep(ph->t_eat);
 }
 
 void	sleep_b(t_ph_b *ph)

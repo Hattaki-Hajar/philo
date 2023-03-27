@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:22:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/26 02:34:44 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/27 02:15:14 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@
 
 typedef struct s_ph_b
 {
-	sem_t			*forks;
 	struct timeval	*init;
-	pid_t			*id;
 	struct timeval	vl;
+	sem_t			*forks;
+	pid_t			*id;
 	int				*ph_nb;
 	int				pos;
 	int				t_die;
