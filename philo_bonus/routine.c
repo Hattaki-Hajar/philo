@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/27 03:23:28 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/28 04:51:24 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@ void	eat_b(t_ph_b *ph)
 	gettimeofday(&vl, 0);
 	time = convert_time(&vl) - convert_time(ph->init);
 	printf("%ld: %d has taken a fork\n", time, ph->pos + 1);
-	sem_post(ph->forks);
-	sem_post(ph->forks);
 	gettimeofday(&(ph->vl), 0);
 	time = convert_time(&(ph->vl)) - convert_time(ph->init);
 	printf("%ld: %d is eating\n", time, ph->pos + 1);
 	my_usleep(ph->t_eat);
+	sem_post(ph->forks);
+	sem_post(ph->forks);
 }
 
 void	sleep_b(t_ph_b *ph)
@@ -49,12 +49,21 @@ void	*routine_b(void *tmp)
 	struct timeval	vl;
 	t_ph_b			*ph;
 	long			time;
+	int				nb;
 
 	ph = (t_ph_b *)tmp;
 	gettimeofday(&(ph->vl), 0);
+	nb = 0;
 	while (1)
 	{
 		eat_b(ph);
+		nb++;
+		if (ph->nb_eat && nb >= ph->nb_eat)
+		{
+			sem_wait(ph->ate);
+			(*(ph->ph_nb))--;
+			sem_post(ph->ate);
+		}
 		sleep_b(ph);
 		gettimeofday(&vl, 0);
 		time = convert_time(&vl) - convert_time(ph->init);
