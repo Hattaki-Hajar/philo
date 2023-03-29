@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 00:36:32 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/28 04:17:37 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 02:45:25 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,12 @@ void	ft_init(int ac, char **av, t_ph_b *ph)
 		(ph + i)->init = init;
 		i++;
 	}
+}
+
+void	child_process(pthread_t *thread, int i, t_ph_b *ph)
+{
+	pthread_create(thread, 0, routine_b, ph + i);
+	pthread_detach(*thread);
+	check_ph(ph + i);
+	exit(0);
 }

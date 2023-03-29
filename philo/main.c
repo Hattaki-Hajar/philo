@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/29 01:16:23 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 02:15:07 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int	create_and_wait_for_threads(int ac, char **av, t_ph *ph)
 	return (0);
 }
 
-void	mutex_init_or_destroy(pthread_mutex_t *id[3] ,int fork_num, int mode)
+void	mutex_init_or_destroy(t_mutex *m, int fork_num, int mode)
 {
 	int	i;
 
@@ -89,28 +89,29 @@ void	mutex_init_or_destroy(pthread_mutex_t *id[3] ,int fork_num, int mode)
 	{
 		while (i < fork_num)
 		{
-			pthread_mutex_init(id[0] + i, 0);
+			pthread_mutex_init(m->forks + i, 0);
 			i++;
 		}
-		pthread_mutex_init(id[1], 0);
-		pthread_mutex_init(id[2], 0);
+		pthread_mutex_init(&(m->eat), 0);
+		pthread_mutex_init(&(m->death), 0);
 	}
 	else if (mode == DESTROY)
 	{
+		pthread_mutex_destroy(&(m->eat));
 		while (i < fork_num)
 		{
-			pthread_mutex_destroy(id[0] + i);
+			pthread_mutex_destroy(m->forks + i);
 			i++;
+			my_usleep(50);
 		}
-		pthread_mutex_destroy(id[1]);
-		pthread_mutex_destroy(id[2]);
+		pthread_mutex_destroy(&(m->death));
 	}
 }
 
 int	main(int ac, char **av)
 {
 	t_ph			*ph;
-	pthread_mutex_t	*mutex[3];
+	t_mutex			*m;
 	int				*died;
 	int				*ph_nb;
 
@@ -121,17 +122,14 @@ int	main(int ac, char **av)
 	if (*ph_nb <= 0)
 		return (ft_putendl_fd("Error: Invalid argument"));
 	ph = (t_ph *)malloc(*ph_nb * sizeof(t_ph));
-	mutex[0] = malloc((*ph_nb) * sizeof(pthread_mutex_t));
-	mutex[1] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-	mutex[2] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	m = malloc(sizeof(t_mutex));
+	m->forks = malloc((*ph_nb) * sizeof(pthread_mutex_t));
 	died = malloc(sizeof(int));
 	*died = 1;
-	mutex_init_or_destroy(mutex, *ph_nb, INIT);
-	// pthread_mutex_init(mutex[1], 0);
-	init2(ph, ph_nb, mutex[2], *ph_nb);
-	init(ph, *ph_nb, mutex, died);
+	mutex_init_or_destroy(m, *ph_nb, INIT);
+	init2(ph, ph_nb, m, *ph_nb);
+	init(ph, *ph_nb, m, died);
 	if (create_and_wait_for_threads(ac, av, ph) == -1)
 		return (0);
-	mutex_init_or_destroy(mutex, ft_atoi(av[1]), DESTROY);
-	// system("leaks philo");
+	mutex_init_or_destroy(m, ft_atoi(av[1]), DESTROY);
 }

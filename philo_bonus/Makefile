@@ -8,8 +8,6 @@ NAME	= philo_bonus
 
 OBJS	= $(SRCS:.c=.o)
 
-MK_FILE	= Makefile
-
 PTHREAD	= -lpthread
 
 .c.o	:
@@ -17,7 +15,7 @@ PTHREAD	= -lpthread
 
 all		: $(NAME)
 
-$(NAME) : $(OBJS) $(MK_FILE)
+$(NAME) : $(OBJS)
 		$(CC) $(CFLAGS) $(PTHREAD) $(SRCS) -o $(NAME)
 
 clean	:

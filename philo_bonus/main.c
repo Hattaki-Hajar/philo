@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:21:21 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/28 18:32:49 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 02:50:20 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,22 +27,43 @@ void	check_ph(t_ph_b *ph)
 	}
 }
 
-void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
+void	print_death(t_ph_b *ph, pid_t *id, int exit, int nb)
 {
 	struct timeval	vl;
 	long			time;
+	int				i;
+
+	if (exit)
+	{
+		gettimeofday(&vl, 0);
+		time = timer(&vl) - timer(ph->init);
+		sem_wait(ph->ate);
+		if (exit && (*(ph->ph_nb)))
+			printf("%ld: %d died\n", time, exit);
+		sem_post(ph->ate);
+	}
+	i = 0;
+	while (i < nb)
+	{
+		kill(id[i], SIGKILL);
+		i++;
+	}
+}
+
+void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
+{
 	int				status;
 	int				i;
 	int				j;
 
 	i = 0;
-	while(i < nb)
+	while (i < nb)
 	{
-		waitpid(id[i],&status,0);
+		waitpid(id[i], &status, 0);
 		if (WIFEXITED(status))
 		{
 			if (WEXITSTATUS(status))
-				break;
+				break ;
 			else
 			{
 				j = -1;
@@ -52,18 +73,7 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 		}
 		i++;
 	}
-	if (WIFEXITED(status))
-	{
-		gettimeofday(&vl, 0);
-		time = timer(&vl) - timer(ph->init);
-		sem_wait(ph->ate);
-		if (WEXITSTATUS(status) && (*(ph->ph_nb)))
-			printf("%ld: %d died\n", time, WEXITSTATUS(status));
-		sem_post(ph->ate);
-	}
-	i = -1;
-	while (++i < nb)
-		kill(id[i], SIGKILL);
+	print_death(ph, id, WEXITSTATUS(status), nb);
 }
 
 sem_t	*create_process(t_ph_b *ph, pid_t *id, int nb)
@@ -87,12 +97,7 @@ sem_t	*create_process(t_ph_b *ph, pid_t *id, int nb)
 		id[i] = fork();
 		gettimeofday(&((ph + i)->vl), 0);
 		if (!id[i])
-		{
-			pthread_create(&thread, 0, routine_b, ph + i);
-			pthread_detach(thread);
-			check_ph(ph + i);
-			exit(0);
-		}
+			child_process(&thread, i, ph);
 		i++;
 	}
 	wait_for_ph(id, nb, ph);

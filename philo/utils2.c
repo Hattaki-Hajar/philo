@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 22:23:29 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/29 01:13:52 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 01:40:18 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,29 +50,28 @@ int	init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init)
 	return (0);
 }
 
-void	init(t_ph *ph, int ph_nb, pthread_mutex_t *m[2], int *died)
+void	init(t_ph *ph, int ph_nb, t_mutex *m, int *died)
 {
 	int	i;
 
 	i = 0;
 	while (i < ph_nb)
 	{
-		(ph + i)->death = m[1];
+		(ph + i)->death = &(m->death);
 		(ph + i)->died = died;
-		(ph + i++)->mutex = m[0];
+		(ph + i++)->mutex = m->forks;
 	}
 }
 
-void	init2(t_ph *ph, int *check, pthread_mutex_t *eat, int nb)
+void	init2(t_ph *ph, int *check, t_mutex *m, int nb)
 {
 	int	i;
 
 	i = 0;
-	// pthread_mutex_init(eat, 0);
-	i = 0;
 	while (i < nb)
 	{
 		(ph + i)->check = check;
-		(ph + i++)->eat = eat;
+		(ph + i)->eat = &(m->eat);
+		i++;
 	}
 }

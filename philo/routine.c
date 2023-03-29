@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 21:00:20 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/29 01:14:38 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 01:59:13 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,8 @@ void	*ft_routine(void *tmp)
 			return (0);
 		ft_eat(ph);
 		nb++;
-		// pthread_mutex_lock(ph->eat);
 		if (!check_eat(ph, nb))
 			return (tmp);
-		// pthread_mutex_unlock(ph->eat);
 		if (died(ph))
 			return (0);
 		ft_sleep(ph);
