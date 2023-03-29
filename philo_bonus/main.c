@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:21:21 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/28 04:52:53 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/28 18:32:49 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ void	check_ph(t_ph_b *ph)
 	while (1)
 	{
 		gettimeofday(&vl, 0);
-		if (!*ph->ph_nb)
-			exit (0);
-		if (convert_time(&vl) - convert_time(&(ph->vl)) >= ph->t_die)
+		sem_wait(ph->ate);
+		sem_post(ph->ate);
+		if (timer(&vl) - timer(&(ph->vl)) >= ph->t_die)
 			exit (ph->pos + 1);
 		usleep(200);
 	}
@@ -33,22 +33,37 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 	long			time;
 	int				status;
 	int				i;
+	int				j;
 
-	waitpid(-1, &status, 0);
+	i = 0;
+	while(i < nb)
+	{
+		waitpid(id[i],&status,0);
+		if (WIFEXITED(status))
+		{
+			if (WEXITSTATUS(status))
+				break;
+			else
+			{
+				j = -1;
+				while (++j < nb)
+					kill(id[j], SIGKILL);
+			}
+		}
+		i++;
+	}
 	if (WIFEXITED(status))
 	{
 		gettimeofday(&vl, 0);
-		time = convert_time(&vl) - convert_time(ph->init);
+		time = timer(&vl) - timer(ph->init);
+		sem_wait(ph->ate);
 		if (WEXITSTATUS(status) && (*(ph->ph_nb)))
 			printf("%ld: %d died\n", time, WEXITSTATUS(status));
+		sem_post(ph->ate);
 	}
-	i = 0;
-	while (i < nb)
-	{
-		if (i != WEXITSTATUS(status))
-			kill(id[i], SIGKILL);
-		i++;
-	}
+	i = -1;
+	while (++i < nb)
+		kill(id[i], SIGKILL);
 }
 
 sem_t	*create_process(t_ph_b *ph, pid_t *id, int nb)

@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 22:56:22 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/24 01:33:11 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 01:01:54 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ typedef struct s_ph
 int		init_struct(t_ph *ph, int ac, char **av, struct timeval *vl_init);
 void	init(t_ph *ph, int ph_nb, pthread_mutex_t *m[2], int *died);
 void	init2(t_ph *ph, int *check, pthread_mutex_t *eat, int nb);
-long	convert_time(struct timeval *init);
+long	timer(struct timeval *init);
 void	ft_printf(char *str, t_ph *ph);
-void	check_eat(t_ph *ph, int nb);
+int		check_eat(t_ph *ph, int nb);
 int		ft_putendl_fd(char	*s);
 void	my_usleep(int time);
 int		ft_atoi(char *str);

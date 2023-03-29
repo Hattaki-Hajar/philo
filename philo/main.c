@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/24 01:39:23 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 01:16:23 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,31 +18,32 @@ void	philo_died(t_ph *ph, struct timeval *vl, struct timeval *init)
 
 	pthread_mutex_lock(ph->death);
 	(*ph->died) = 0;
-	time = convert_time(vl) - convert_time(init);
-	printf("%ld: %d died\n", time, ph->pos + 1);
 	pthread_mutex_unlock(ph->death);
+	time = timer(vl) - timer(init);
+	printf("%ld: %d died\n", time, ph->pos + 1);
 }
 
 int	check_death(t_ph *ph, struct timeval *init)
 {
 	struct timeval	vl;
 	int				i;
-	long			time;
 
 	while (1)
 	{
 		i = 0;
 		while (i < ph->nb)
 		{
-			pthread_mutex_lock(ph->eat);
-			if (*(ph->check) <= 0)
-				return (0);
-			pthread_mutex_unlock(ph->eat);
-			gettimeofday(&vl, 0);
-			time = convert_time(&(vl)) - convert_time(&(ph->vl));
-			if (time >= ph->time_to_die)
+			pthread_mutex_lock((ph + i)->eat);
+			if (*((ph + i)->check) <= 0)
 			{
-				philo_died(ph, &vl, init);
+				pthread_mutex_unlock((ph + i)->eat);
+				return (0);
+			}
+			pthread_mutex_unlock((ph + i)->eat);
+			gettimeofday(&vl, 0);
+			if (timer(&(vl)) - timer(&(ph->vl)) >= ph->time_to_die)
+			{
+				philo_died((ph + i), &vl, init);
 				return (0);
 			}
 			i++;
@@ -79,7 +80,7 @@ int	create_and_wait_for_threads(int ac, char **av, t_ph *ph)
 	return (0);
 }
 
-void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
+void	mutex_init_or_destroy(pthread_mutex_t *id[3] ,int fork_num, int mode)
 {
 	int	i;
 
@@ -88,27 +89,28 @@ void	mutex_init_or_destroy(pthread_mutex_t *id, int fork_num, int mode)
 	{
 		while (i < fork_num)
 		{
-			pthread_mutex_init(id + i, NULL);
+			pthread_mutex_init(id[0] + i, 0);
 			i++;
 		}
-		pthread_mutex_init(++id, 0);
+		pthread_mutex_init(id[1], 0);
+		pthread_mutex_init(id[2], 0);
 	}
-	else
+	else if (mode == DESTROY)
 	{
 		while (i < fork_num)
 		{
-			pthread_mutex_destroy(id + i);
+			pthread_mutex_destroy(id[0] + i);
 			i++;
 		}
-		pthread_mutex_destroy(++id);
+		pthread_mutex_destroy(id[1]);
+		pthread_mutex_destroy(id[2]);
 	}
 }
 
 int	main(int ac, char **av)
 {
 	t_ph			*ph;
-	pthread_mutex_t	*mutex[2];
-	pthread_mutex_t	*eat;
+	pthread_mutex_t	*mutex[3];
 	int				*died;
 	int				*ph_nb;
 
@@ -121,14 +123,15 @@ int	main(int ac, char **av)
 	ph = (t_ph *)malloc(*ph_nb * sizeof(t_ph));
 	mutex[0] = malloc((*ph_nb) * sizeof(pthread_mutex_t));
 	mutex[1] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-	eat = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	mutex[2] = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 	died = malloc(sizeof(int));
 	*died = 1;
-	mutex_init_or_destroy(mutex[0], *ph_nb, INIT);
-	init2(ph, ph_nb, eat, *ph_nb);
+	mutex_init_or_destroy(mutex, *ph_nb, INIT);
+	// pthread_mutex_init(mutex[1], 0);
+	init2(ph, ph_nb, mutex[2], *ph_nb);
 	init(ph, *ph_nb, mutex, died);
 	if (create_and_wait_for_threads(ac, av, ph) == -1)
 		return (0);
-	mutex_init_or_destroy(mutex[0], ft_atoi(av[1]), DESTROY);
-	pthread_mutex_destroy(eat);
+	mutex_init_or_destroy(mutex, ft_atoi(av[1]), DESTROY);
+	// system("leaks philo");
 }

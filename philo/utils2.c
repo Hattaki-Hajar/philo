@@ -6,23 +6,24 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 22:23:29 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/24 01:32:36 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/29 01:13:52 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	check_eat(t_ph *ph, int nb)
+int	check_eat(t_ph *ph, int nb)
 {
-	if (ph->nb_to_eat > -1 && nb >= ph->nb_to_eat)
+	if (ph->nb_to_eat > -1 && nb == ph->nb_to_eat)
 	{
 		pthread_mutex_lock(ph->eat);
 		(*(ph->check))--;
 		pthread_mutex_unlock(ph->eat);
 	}
+	return (1);
 }
 
-long	convert_time(struct timeval *init)
+long	timer(struct timeval *init)
 {
 	long	res;
 
@@ -67,7 +68,7 @@ void	init2(t_ph *ph, int *check, pthread_mutex_t *eat, int nb)
 	int	i;
 
 	i = 0;
-	pthread_mutex_init(eat, 0);
+	// pthread_mutex_init(eat, 0);
 	i = 0;
 	while (i < nb)
 	{
