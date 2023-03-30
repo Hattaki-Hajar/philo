@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/28 18:33:03 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/30 21:30:56 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,21 @@ void	sleep_b(t_ph_b *ph)
 	my_usleep(ph->t_sleep);
 }
 
+void	check_b(t_ph_b *ph)
+{
+	sem_wait(ph->ate);
+	if (ph->nb_eat)
+	{
+		(*(ph->ph_nb))--;
+		if (!*(ph->ph_nb))
+		{
+			sem_post(ph->ate);
+			exit (0);
+		}
+	}
+	sem_post(ph->ate);
+}
+
 void	*routine_b(void *tmp)
 {
 	struct timeval	vl;
@@ -55,14 +70,7 @@ void	*routine_b(void *tmp)
 	while (1)
 	{
 		eat_b(ph);
-		sem_wait(ph->ate);
-		if (ph->nb_eat)
-		{
-			(*(ph->ph_nb))--;
-			if (!*(ph->ph_nb))
-				exit (0);
-		}
-		sem_post(ph->ate);
+		check_b(ph);
 		sleep_b(ph);
 		gettimeofday(&vl, 0);
 		time = timer(&vl) - timer(ph->init);
