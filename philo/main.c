@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/12 16:31:42 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/30 21:26:41 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/31 02:45:57 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,11 @@ void	mutex_init_or_destroy(t_mutex *m, int fork_num, int mode)
 	else if (mode == DESTROY)
 	{
 		while (i < fork_num)
-			if (!pthread_mutex_destroy(m->forks + i))
-				i++;
+		{
+			pthread_mutex_destroy(m->forks + i);
+			i++;
+			my_usleep(50);
+		}
 		pthread_mutex_destroy(&(m->eat));
 		pthread_mutex_destroy(&(m->death));
 	}

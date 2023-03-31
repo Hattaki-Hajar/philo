@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 00:36:32 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/29 02:45:25 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/31 04:12:05 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void	init_ph(char **av, t_ph_b *ph, int *ph_nb)
 		(ph + i)->t_die = args[0];
 		(ph + i)->t_eat = args[1];
 		(ph + i)->t_sleep = args[2];
+		(ph + i)->meals_nb = 0;
 		i++;
 	}
 }

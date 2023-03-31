@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:21:21 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/30 21:25:41 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/31 04:53:25 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,19 @@ void	check_ph(t_ph_b *ph)
 	while (1)
 	{
 		gettimeofday(&vl, 0);
-		sem_wait(ph->ate);
-		sem_post(ph->ate);
+		// printf("----------- %d %d\n", ph->nb_eat, ph->meals_nb);
+		// if (ph->nb_eat && ph->meals_nb == ph->nb_eat)
+		// {
+		// 	sem_wait(ph->ate);
+		// 	printf("******** %d\n", *ph->ph_nb);
+		// 	(*(ph->ph_nb))--;
+		// 	if (!*(ph->ph_nb))
+		// 	{
+		// 		sem_post(ph->ate);
+		// 		exit(0);
+		// 	}
+		// 	sem_post(ph->ate);
+		// }
 		if (timer(&vl) - timer(&(ph->vl)) >= ph->t_die)
 			exit (ph->pos + 1);
 		usleep(200);

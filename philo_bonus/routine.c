@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/30 21:30:56 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/03/31 05:19:31 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	eat_b(t_ph_b *ph)
 	printf("%ld: %d has taken a fork\n", time, ph->pos + 1);
 	gettimeofday(&(ph->vl), 0);
 	time = timer(&(ph->vl)) - timer(ph->init);
-	printf("%ld: %d is eating\n", time, ph->pos + 1);
+	printf("%ld: %d \033[34mis eating\033[0m\n", time, ph->pos + 1);
 	my_usleep(ph->t_eat);
 	sem_post(ph->forks);
 	sem_post(ph->forks);
@@ -46,17 +46,19 @@ void	sleep_b(t_ph_b *ph)
 
 void	check_b(t_ph_b *ph)
 {
-	sem_wait(ph->ate);
-	if (ph->nb_eat)
+	printf("********%d %d %d\n", ph->meals_nb, ph->nb_eat, ph->pos + 1);
+	if (ph->nb_eat && ph->meals_nb == ph->nb_eat)
 	{
+		sem_wait(ph->ate);
 		(*(ph->ph_nb))--;
+		printf("----->here %d******\n", *ph->ph_nb);
 		if (!*(ph->ph_nb))
 		{
 			sem_post(ph->ate);
 			exit (0);
 		}
+		sem_post(ph->ate);
 	}
-	sem_post(ph->ate);
 }
 
 void	*routine_b(void *tmp)
@@ -70,6 +72,7 @@ void	*routine_b(void *tmp)
 	while (1)
 	{
 		eat_b(ph);
+		ph->meals_nb++;
 		check_b(ph);
 		sleep_b(ph);
 		gettimeofday(&vl, 0);
