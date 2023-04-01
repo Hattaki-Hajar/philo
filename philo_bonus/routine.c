@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/04/01 00:57:03 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/04/01 03:51:04 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	*routine_b(void *tmp)
 	{
 		eat_b(ph);
 		ph->meals_nb++;
-		if (ph->meals_nb >= ph->nb_eat)
+		if (ph->nb_eat && ph->meals_nb >= ph->nb_eat)
 			exit (0);
 		sleep_b(ph);
 		gettimeofday(&vl, 0);

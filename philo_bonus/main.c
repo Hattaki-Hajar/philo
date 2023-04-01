@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:21:21 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/04/01 01:00:29 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/04/01 03:56:32 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,6 @@ void	check_ph(t_ph_b *ph)
 
 	while (1)
 	{
-		if (ph->nb_eat && ph->meals_nb >= ph->nb_eat)
-		{
-			sem_wait(ph->ate);
-			if (ph->meals_nb >= ph->nb_eat)
-			{
-				sem_post(ph->ate);
-				exit(0);
-			}
-			sem_post(ph->ate);
-		}
 		gettimeofday(&vl, 0);
 		if (timer(&vl) - timer(&(ph->vl)) >= ph->t_die)
 			exit (ph->pos + 1);
@@ -45,10 +35,8 @@ void	print_death(t_ph_b *ph, pid_t *id, int exit, int nb)
 	{
 		gettimeofday(&vl, 0);
 		time = timer(&vl) - timer(ph->init);
-		sem_wait(ph->ate);
 		if (exit && (*(ph->ph_nb)))
 			printf("%ld: %d died\n", time, exit);
-		sem_post(ph->ate);
 	}
 	i = 0;
 	while (i < nb)
@@ -62,7 +50,6 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 {
 	int				status;
 	int				i;
-	// int				j;
 
 	i = 0;
 	while (i < nb)
@@ -72,13 +59,6 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 		{
 			if (WEXITSTATUS(status))
 				break ;
-			// else
-			// {
-			// 	j = -1;
-			// 	while (++j < nb)
-			// 		kill(id[j], SIGKILL);
-			// 	return ;
-			// }
 		}
 		i++;
 	}
@@ -106,10 +86,7 @@ sem_t	*create_process(t_ph_b *ph, pid_t *id, int nb)
 		id[i] = fork();
 		gettimeofday(&((ph + i)->vl), 0);
 		if (!id[i])
-		{
 			child_process(&thread, i, ph);
-			exit(0);
-		}
 		i++;
 	}
 	wait_for_ph(id, nb, ph);
