@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/24 21:21:21 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/31 04:53:25 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/04/01 01:00:29 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,17 @@ void	check_ph(t_ph_b *ph)
 
 	while (1)
 	{
+		if (ph->nb_eat && ph->meals_nb >= ph->nb_eat)
+		{
+			sem_wait(ph->ate);
+			if (ph->meals_nb >= ph->nb_eat)
+			{
+				sem_post(ph->ate);
+				exit(0);
+			}
+			sem_post(ph->ate);
+		}
 		gettimeofday(&vl, 0);
-		// printf("----------- %d %d\n", ph->nb_eat, ph->meals_nb);
-		// if (ph->nb_eat && ph->meals_nb == ph->nb_eat)
-		// {
-		// 	sem_wait(ph->ate);
-		// 	printf("******** %d\n", *ph->ph_nb);
-		// 	(*(ph->ph_nb))--;
-		// 	if (!*(ph->ph_nb))
-		// 	{
-		// 		sem_post(ph->ate);
-		// 		exit(0);
-		// 	}
-		// 	sem_post(ph->ate);
-		// }
 		if (timer(&vl) - timer(&(ph->vl)) >= ph->t_die)
 			exit (ph->pos + 1);
 		usleep(200);
@@ -65,7 +62,7 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 {
 	int				status;
 	int				i;
-	int				j;
+	// int				j;
 
 	i = 0;
 	while (i < nb)
@@ -75,12 +72,13 @@ void	wait_for_ph(pid_t *id, int nb, t_ph_b *ph)
 		{
 			if (WEXITSTATUS(status))
 				break ;
-			else
-			{
-				j = -1;
-				while (++j < nb)
-					kill(id[j], SIGKILL);
-			}
+			// else
+			// {
+			// 	j = -1;
+			// 	while (++j < nb)
+			// 		kill(id[j], SIGKILL);
+			// 	return ;
+			// }
 		}
 		i++;
 	}
@@ -108,7 +106,10 @@ sem_t	*create_process(t_ph_b *ph, pid_t *id, int nb)
 		id[i] = fork();
 		gettimeofday(&((ph + i)->vl), 0);
 		if (!id[i])
+		{
 			child_process(&thread, i, ph);
+			exit(0);
+		}
 		i++;
 	}
 	wait_for_ph(id, nb, ph);
@@ -127,7 +128,7 @@ int	main(int ac, char **av)
 		return (ft_putendl_fd("Error: Wrong number of arguments"));
 	ph_nb = malloc(sizeof(int));
 	*ph_nb = ft_atoi(av[1]);
-	if (*ph_nb <= 0)
+	if (ph_nb <= 0)
 		return (ft_putendl_fd("Error: Invalid argument"));
 	sem_unlink("forks");
 	sem_unlink("ate");

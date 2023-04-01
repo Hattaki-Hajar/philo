@@ -6,7 +6,7 @@
 /*   By: hhattaki <hhattaki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 21:02:56 by hhattaki          #+#    #+#             */
-/*   Updated: 2023/03/31 05:19:31 by hhattaki         ###   ########.fr       */
+/*   Updated: 2023/04/01 00:57:03 by hhattaki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,23 +44,6 @@ void	sleep_b(t_ph_b *ph)
 	my_usleep(ph->t_sleep);
 }
 
-void	check_b(t_ph_b *ph)
-{
-	printf("********%d %d %d\n", ph->meals_nb, ph->nb_eat, ph->pos + 1);
-	if (ph->nb_eat && ph->meals_nb == ph->nb_eat)
-	{
-		sem_wait(ph->ate);
-		(*(ph->ph_nb))--;
-		printf("----->here %d******\n", *ph->ph_nb);
-		if (!*(ph->ph_nb))
-		{
-			sem_post(ph->ate);
-			exit (0);
-		}
-		sem_post(ph->ate);
-	}
-}
-
 void	*routine_b(void *tmp)
 {
 	struct timeval	vl;
@@ -73,7 +56,8 @@ void	*routine_b(void *tmp)
 	{
 		eat_b(ph);
 		ph->meals_nb++;
-		check_b(ph);
+		if (ph->meals_nb >= ph->nb_eat)
+			exit (0);
 		sleep_b(ph);
 		gettimeofday(&vl, 0);
 		time = timer(&vl) - timer(ph->init);
